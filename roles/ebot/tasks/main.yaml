@@ -1,0 +1,35 @@
+---
+
+- name: Install git
+  apt: 
+    name: "git"
+    state: present
+    update_cache: yes
+
+- name: Check repo exists
+  stat:
+    path: "/srv/ebot-docker/"
+  register: ebot_dir
+
+- name: Checkout git ebot docker image
+  git:
+    repo: "https://github.com/jffz/docker-ebot.git"
+    dest: "/srv/ebot-docker/"
+  when: ebot_dir.stat.exists == False 
+
+- name: Update docker with external ip
+  replace:
+    dest: "/srv/ebot-docker/docker-compose.yml"
+    regexp: "EXTERNAL_IP: 'xxx.xxx.xxx.xxx'"
+    replace: "EXTERNAL_IP: '{{ ansible_default_ipv4.address }}'"
+
+- name: Update docker with external ip
+  replace:
+    dest: "/srv/ebot-docker/docker-compose.yml"
+    regexp: "EBOT_IP: 'xxx.xxx.xxx.xxx'"
+    replace: "EBOT_IP: '{{ ansible_default_ipv4.address }}'"
+
+- name: Run ebot compose
+  docker_service:
+    project_src: /srv/ebot-docker/
+    state: present

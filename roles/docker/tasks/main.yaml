@@ -1,0 +1,27 @@
+---
+- name: Add docker apt-key
+  apt_key:
+    url: "https://download.docker.com/linux/ubuntu/gpg"
+    state: present
+
+- name: Add docker repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename|lower }} stable"
+    state: present
+    update_cache: yes
+
+- name: Install docker package
+  apt:
+    name: docker-ce
+    state: present
+
+- name: Auto start docker
+  service: name=docker state=started
+
+- name: Install docker python libs
+  pip:
+    name: "{{ item }}"
+  with_items:
+    # docker-py
+    # docker-py==1.9.0
+    docker-compose

@@ -1,0 +1,24 @@
+---
+
+- hosts: all
+  gather_facts: False
+  
+  tasks:
+  - name: install python (for ansible)
+    raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+
+- name: Install Ebot-depencies
+  hosts: all
+  remote_user: root
+  # remote_user: user
+  # become: yes
+  # become_method: sudo
+
+  roles:
+    - common
+    - docker.ubuntu
+    - ebot
+    # - mysql
+    # - nginx
+    # - php-fpm
+    # - wordpress
